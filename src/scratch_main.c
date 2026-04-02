@@ -19,16 +19,14 @@
 internal void
 entry_point(CmdLine *cmdline)
 {
-	U8 *buffer = "all i want for christmas is youuuu";
+	U8 *buffer = "u8 kappa = 12; \n u64 kippo = &kappa; \n b32 is_true = (kippo == &kappa);";
 	Lexer *lexer = lexer_alloc();
 	lexer->curr = buffer;
 
 	lexer_analyze(lexer);
 
 	for (Token *curr = lexer->token_head; curr != 0; curr = curr->next)
-	{
 		lexer_print_token(curr);
-	}
 
 	lexer_release(lexer);
 	return;

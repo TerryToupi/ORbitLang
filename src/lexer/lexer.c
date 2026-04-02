@@ -1,3 +1,46 @@
+
+read_only internal String8 token_to_literal[] =
+{
+  str8_lit_comp("TokenKind_num"),
+  str8_lit_comp("TokenKind_identifier"),
+  str8_lit_comp("TokenKind_string"),
+  str8_lit_comp("TokenKind_u8"),
+  str8_lit_comp("TokenKind_u16"),
+  str8_lit_comp("TokenKind_u32"),
+  str8_lit_comp("TokenKind_u64"),
+  str8_lit_comp("TokenKind_s8"),
+  str8_lit_comp("TokenKind_s16"),
+  str8_lit_comp("TokenKind_s32"),
+  str8_lit_comp("TokenKind_s64"),
+  str8_lit_comp("TokenKind_b8"),
+  str8_lit_comp("TokenKind_b16"),
+  str8_lit_comp("TokenKind_b32"),
+  str8_lit_comp("TokenKind_b64"),
+  str8_lit_comp("TokenKind_f32"),
+  str8_lit_comp("TokenKind_f64"),
+};
+
+read_only internal String8 token_to_type_literal[] =
+{
+  str8_lit_comp(""),
+  str8_lit_comp(""),
+  str8_lit_comp(""),
+  str8_lit_comp("u8"),
+  str8_lit_comp("u16"),
+  str8_lit_comp("u32"),
+  str8_lit_comp("u64"),
+  str8_lit_comp("s8"),
+  str8_lit_comp("s16"),
+  str8_lit_comp("s32"),
+  str8_lit_comp("s64"),
+  str8_lit_comp("b8"),
+  str8_lit_comp("b16"),
+  str8_lit_comp("b32"),
+  str8_lit_comp("b64"),
+  str8_lit_comp("f32"),
+  str8_lit_comp("f64"),
+};
+
 internal Lexer *
 lexer_alloc(void)
 {
@@ -31,15 +74,94 @@ lexer_release(Lexer *lexer)
   arena_release(lexer->arena);
 }
 
+internal U8
+lexer_peak(Lexer *lexer, U8 advance)
+{
+  if (*(lexer->curr + advance))
+    return *(lexer->curr + advance);
+  else
+    return '\0';
+}
+
+internal B32
+lexer_is_curr_type_keyword(Lexer *lexer)
+{
+  if (!(*lexer->curr == 'u' || *lexer->curr == 's' || *lexer->curr == 'b' || *lexer->curr == 'f'))
+    return 0;
+
+  if (lexer_peak(lexer, 1) == '8')
+    return 1; 
+
+  String8 value = str8(lexer->curr + 1, 2);
+  return str8_match(value, str8("16", 2), StringMatchFlag_CaseInsensitive) ||
+          str8_match(value, str8("32", 2), StringMatchFlag_CaseInsensitive) ||
+          str8_match(value, str8("64", 2), StringMatchFlag_CaseInsensitive);
+}
+
+internal void
+lexer_push_type_keyword(Lexer *lexer)
+{
+
+  String8 value;
+  for (TokenKind kind = TokenKind_u8; kind < TokenKind_COUNT; ++kind)
+  {
+    switch (kind)
+    {
+    case TokenKind_u8:
+      if (str8_match(str8(lexer->curr, 2), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_u8, str8(lexer->curr, 2), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_u16:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_u16, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_u32:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_u32, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_u64:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_u64, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_s8:
+      if (str8_match(str8(lexer->curr, 2), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_s8, str8(lexer->curr, 2), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_s16:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_s16, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_s32:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_s32, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_s64:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_s64, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_b8:
+      if (str8_match(str8(lexer->curr, 2), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_b8, str8(lexer->curr, 2), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_b16:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_b16, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_b32:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_b32, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    case TokenKind_b64:
+      if (str8_match(str8(lexer->curr, 3), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
+        lexer_token_push(lexer, TokenKind_b64, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
+      break;
+    }
+  }
+}
+
 internal void
 lexer_print_token(Token *token)
 {
-  String8 token_to_literal[] =
-  {
-    str8_lit_comp("TokenKind_num"),
-    str8_lit_comp("TokenKind_ident"),
-  };
-
   fprintf(stdout, "\n==== NEW TOKEN ====");
   fprintf(stdout, "\nTokne->kind = %.*s", str8_varg(token_to_literal[token->kind]));
   fprintf(stdout, "\nTokne->value = %.*s", str8_varg(token->value));
@@ -53,19 +175,27 @@ lexer_analyze(Lexer *lexer)
   while (*lexer->curr != '\0')
   {
     if (char_is_alpha(*lexer->curr))
-    { 
-      U64 ident_size = 1;
-      U8  peak_next = *(lexer->curr + 1);
-      B32 is_alpha = char_is_alpha(peak_next) && !char_is_space(peak_next);
-      for (U64 i = ident_size + 1; is_alpha == 1; ++i)
+    {
+      if (lexer_is_curr_type_keyword(lexer))
       {
-        ++ident_size;
-        peak_next = *(lexer->curr + i);
-        is_alpha = char_is_alpha(peak_next) && !char_is_space(peak_next);
+        lexer_push_type_keyword(lexer);
       }
-      lexer_token_push(lexer, TokenKind_identifier, str8(lexer->curr, ident_size), (Location){lexer->line_number, lexer->line_number}, str8("", 0));
-      lexer->curr += ident_size;
+      else 
+      { 
+        U64 ident_size = 1;
+        U8  peak_next = *(lexer->curr + 1);
+        B32 is_alpha = char_is_alpha(peak_next) && !char_is_space(peak_next);
+        for (U64 i = ident_size + 1; is_alpha == 1; ++i)
+        {
+          ++ident_size;
+          peak_next = *(lexer->curr + i);
+          is_alpha = char_is_alpha(peak_next) && !char_is_space(peak_next);
+        }
+        lexer_token_push(lexer, TokenKind_identifier, str8(lexer->curr, ident_size), (Location){lexer->line_number, lexer->line_number}, str8("", 0));
+        lexer->curr += ident_size;
+      }
     }
-    lexer->curr++;
+
+    lexer->curr ++;
   }
 }
