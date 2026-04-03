@@ -167,7 +167,7 @@ lexer_push_type_keyword(Lexer *lexer)
     lexer->curr += 3;
     return;
   }
-  if (str8_match(str8(lexer->curr, 3), token_to_type_literal[TokenKind_b64], StringMatchFlag_CaseInsensitive))
+  else if (str8_match(str8(lexer->curr, 3), token_to_type_literal[TokenKind_b64], StringMatchFlag_CaseInsensitive))
   {
     lexer_token_push(lexer, TokenKind_b64, str8(lexer->curr, 3), (Location){0, 0}, str8("", 0));
     lexer->curr += 3;

@@ -19,7 +19,7 @@
 internal void
 entry_point(CmdLine *cmdline)
 {
-	U8 *buffer = "u8 kappa = 12; \n u64 kippo = &kappa; \n b32 is_true = (kippo == &kappa);";
+	U8 *buffer = "u8 kappa = 12; \n u32 kippo = 12";
 	Lexer *lexer = lexer_alloc();
 	lexer->curr = buffer;
 
