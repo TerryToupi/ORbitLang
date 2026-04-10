@@ -68,8 +68,8 @@ lexer_alloc(void)
   lexer->token_end = 0;
   lexer->curr = 0;
   lexer->line_start = 0;
-  lexer->line_number = 0;
-  lexer->col_number = 0;
+  lexer->line_number = 1;
+  lexer->col_number = 1;
   return lexer;
 }
 
@@ -131,8 +131,9 @@ lexer_push_type_keyword(Lexer *lexer)
   {
     if (str8_match(str8(lexer->curr, token_to_type_literal_size[kind]), token_to_type_literal[kind], StringMatchFlag_CaseInsensitive))
     {
-      lexer_token_push(lexer, kind, str8(lexer->curr, token_to_type_literal_size[kind]), (Location){0, 0}, str8("", 0));
+      lexer_token_push(lexer, kind, str8(lexer->curr, token_to_type_literal_size[kind]), (Location){lexer->line_number, lexer->col_number}, str8("", 0));
       lexer->curr += token_to_type_literal_size[kind];
+      lexer->col_number += token_to_type_literal_size[kind];
       return;
     }
   }
@@ -148,7 +149,8 @@ lexer_push_ident(Lexer *lexer)
     lexer->curr += 1;
   }
 
-  lexer_token_push(lexer, TokenKind_identifier, value, (Location){0, 0}, str8("", 0));
+  lexer_token_push(lexer, TokenKind_identifier, value, (Location){lexer->line_number, lexer->col_number}, str8("", 0));
+  lexer->col_number += value.size;
 }
 
 internal void
@@ -179,6 +181,19 @@ lexer_analyze(Lexer *lexer)
     }
     else
     {
+      if (char_is_space(*lexer->curr))
+      {
+        if (lexer_peak(lexer, 0) == ' ')
+        {
+          lexer->col_number += 1;
+        }
+        else
+        {
+          lexer->col_number = 1;
+          lexer->line_number += 1;
+        }
+      }
+      
       lexer->curr += 1;
     }
   }
